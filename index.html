@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Build Your Own Website · An Interactive Guide</title>
+<style>
+  /* ==========================================================
+     PLAYFUL & COLORFUL — interactive walkthrough
+     ========================================================== */
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --pink:   #ff6fa3;
+    --orange: #ffa45c;
+    --yellow: #ffd93d;
+    --lime:   #a7f04a;
+    --teal:   #4dd6c5;
+    --blue:   #6ea8ff;
+    --purple: #b388ff;
+    --ink:    #1b1145;
+    --paper:  #fff8ef;
+    --cream:  #fff2e1;
+    --shadow: 0 18px 40px -18px rgba(27, 17, 69, .35);
+    --shadow-strong: 0 30px 60px -25px rgba(27, 17, 69, .55);
+    --radius-lg: 28px;
+    --radius-md: 18px;
+    --radius-sm: 12px;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
+
+  /* ---------- Floating gradient blobs ---------- */
+  .bg-blobs {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+  }
+  .bg-blobs span {
+    position: absolute; border-radius: 50%; filter: blur(70px); opacity: .55;
+    animation: float 14s ease-in-out infinite;
+  }
+  .bg-blobs span:nth-child(1) { background: var(--pink);   width: 420px; height: 420px; top: -120px; left: -100px; }
+  .bg-blobs span:nth-child(2) { background: var(--yellow); width: 360px; height: 360px; top: 30%;  right: -120px; animation-delay: -3s; }
+  .bg-blobs span:nth-child(3) { background: var(--teal);   width: 380px; height: 380px; bottom: -150px; left: 20%;  animation-delay: -6s; }
+  .bg-blobs span:nth-child(4) { background: var(--purple); width: 300px; height: 300px; top: 55%;   left: -80px;  animation-delay: -9s; }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(40px, -30px) scale(1.1); }
+  }
+
+  /* ---------- Sticky progress bar ---------- */
+  .progress-bar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255, 248, 239, .92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 2px dashed rgba(27, 17, 69, .1);
+    padding: 14px 24px;
+    display: flex; align-items: center; gap: 16px;
+    flex-wrap: wrap;
+  }
+  .progress-bar .brand {
+    font-weight: 800; font-size: 1.05rem; letter-spacing: -.01em;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .progress-bar .brand span {
+    background: linear-gradient(135deg, var(--pink), var(--orange));
+    color: white; padding: 4px 10px; border-radius: 99px; font-size: .75rem;
+  }
+  .progress-track {
+    flex: 1; min-width: 200px;
+    height: 10px; background: rgba(27,17,69,.08);
+    border-radius: 99px; position: relative; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--pink), var(--orange), var(--yellow), var(--lime), var(--teal), var(--blue), var(--purple));
+    border-radius: 99px;
+    transition: width .6s cubic-bezier(.22,.61,.36,1);
+  }
+  .progress-pills {
+    display: flex; gap: 8px;
+  }
+  .progress-pill {
+    width: 36px; height: 36px; border-radius: 99px;
+    display: grid; place-items: center; font-weight: 700;
+    background: rgba(27,17,69,.06); color: rgba(27,17,69,.4);
+    transition: all .35s ease; cursor: pointer; border: none;
+    font-size: .9rem;
+  }
+  .progress-pill.active {
+    background: linear-gradient(135deg, var(--pink), var(--orange));
+    color: white; transform: scale(1.15); box-shadow: var(--shadow);
+  }
+  .progress-pill.done {
+    background: var(--lime); color: var(--ink);
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    padding: 80px 24px 60px;
+    text-align: center;
+    max-width: 920px; margin: 0 auto;
+  }
+  .hero .badge {
+    display: inline-block; background: white; color: var(--ink);
+    padding: 8px 16px; border-radius: 99px; font-weight: 700; font-size: .85rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 22px;
+    border: 2px solid var(--ink);
+  }
+  .hero h1 {
+    font-size: clamp(2.4rem, 6vw, 4.4rem);
+    line-height: 1.05; margin: 0 0 18px;
+    font-weight: 800; letter-spacing: -.03em;
+  }
+  .hero h1 .grad {
+    background: linear-gradient(120deg, var(--pink), var(--orange) 30%, var(--purple) 60%, var(--blue));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    display: inline-block;
+  }
+  .hero p {
+    font-size: 1.15rem; line-height: 1.6; max-width: 640px; margin: 0 auto;
+    color: rgba(27,17,69,.75);
+  }
+  .hero .emoji-row {
+    margin-top: 30px; font-size: 2rem; display: flex; gap: 18px; justify-content: center;
+  }
+  .hero .emoji-row span {
+    display: inline-block; animation: bounce 2.5s ease-in-out infinite;
+  }
+  .hero .emoji-row span:nth-child(2) { animation-delay: .15s; }
+  .hero .emoji-row span:nth-child(3) { animation-delay: .3s; }
+  .hero .emoji-row span:nth-child(4) { animation-delay: .45s; }
+  .hero .emoji-row span:nth-child(5) { animation-delay: .6s; }
+  @keyframes bounce {
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-12px); }
+  }
+
+  /* ---------- Step cards / walkthrough ---------- */
+  .walkthrough {
+    max-width: 1100px; margin: 40px auto 0;
+    padding: 0 24px 80px;
+  }
+
+  .step-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 36px;
+    box-shadow: var(--shadow);
+    margin-bottom: 28px;
+    border: 3px solid transparent;
+    transition: all .5s cubic-bezier(.22,.61,.36,1);
+    opacity: .55; transform: scale(.97);
+    position: relative; overflow: hidden;
+  }
+  .step-card.active {
+    opacity: 1; transform: scale(1);
+    border-color: var(--ink);
+    box-shadow: var(--shadow-strong);
+  }
+  .step-card::before {
+    content: ""; position: absolute; top: -50px; right: -50px;
+    width: 220px; height: 220px; border-radius: 50%;
+    opacity: .15;
+  }
+  .step-card[data-step="1"]::before { background: var(--pink); }
+  .step-card[data-step="2"]::before { background: var(--teal); }
+  .step-card[data-step="3"]::before { background: var(--lime); }
+
+  .step-header {
+    display: flex; align-items: center; gap: 16px; margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .step-num {
+    font-size: 1.1rem; font-weight: 800;
+    background: var(--ink); color: white;
+    padding: 6px 14px; border-radius: 99px;
+    letter-spacing: .02em;
+  }
+  .step-card[data-step="1"] .step-num { background: var(--pink); }
+  .step-card[data-step="2"] .step-num { background: var(--teal); }
+  .step-card[data-step="3"] .step-num { background: var(--lime); }
+  .step-tag {
+    font-size: .8rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .1em; color: rgba(27,17,69,.5);
+  }
+  .step-emoji { font-size: 2.4rem; }
+
+  .step-card h2 {
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    margin: 8px 0 12px; letter-spacing: -.02em; line-height: 1.1;
+    font-weight: 800;
+  }
+  .step-card .lede {
+    font-size: 1.05rem; line-height: 1.6; color: rgba(27,17,69,.75);
+    max-width: 760px; margin: 0 0 28px;
+  }
+
+  /* ---------- Sub-step grid (hidden by default) ---------- */
+  .substeps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px; margin-bottom: 24px;
+  }
+  .substep {
+    background: var(--cream);
+    padding: 14px 16px; border-radius: var(--radius-md);
+    border-left: 5px solid var(--ink);
+    font-size: .92rem; line-height: 1.5;
+    display: flex; gap: 10px; align-items: flex-start;
+    transition: transform .25s ease;
+  }
+  .substep:hover { transform: translateX(4px); }
+  .substep b { display: block; font-size: .8rem; text-transform: uppercase;
+    letter-spacing: .05em; color: rgba(27,17,69,.6); margin-bottom: 2px; }
+  .step-card[data-step="1"] .substep { border-left-color: var(--pink); }
+  .step-card[data-step="2"] .substep { border-left-color: var(--teal); }
+  .step-card[data-step="3"] .substep { border-left-color: var(--lime); }
+
+  /* ---------- Image showcase ---------- */
+  .showcase {
+    position: relative;
+    background: linear-gradient(135deg, var(--cream), white);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    border: 2px dashed rgba(27,17,69,.15);
+    margin-bottom: 12px;
+  }
+  .showcase-label {
+    display: inline-block; background: var(--ink); color: white;
+    padding: 4px 12px; border-radius: 99px; font-size: .75rem; font-weight: 700;
+    letter-spacing: .05em; text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .showcase img {
+    max-width: 100%; height: auto;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--ink);
+    box-shadow: var(--shadow);
+    display: block;
+    transition: transform .35s ease;
+  }
+  .showcase img:hover { transform: scale(1.01); }
+  .showcase-caption {
+    margin-top: 12px; font-size: .85rem; color: rgba(27,17,69,.6);
+    font-style: italic; text-align: center;
+  }
+
+  /* ---------- Step navigation buttons ---------- */
+  .step-nav {
+    display: flex; justify-content: space-between;
+    margin-top: 28px; gap: 12px; flex-wrap: wrap;
+  }
+  .btn {
+    appearance: none; border: 2px solid var(--ink);
+    background: white; color: var(--ink);
+    padding: 14px 24px; border-radius: 99px;
+    font-weight: 700; font-size: 1rem; cursor: pointer;
+    transition: all .25s ease;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+  .btn-primary {
+    background: var(--ink); color: white;
+  }
+  .btn-primary:hover { background: var(--purple); border-color: var(--purple); }
+  .btn:disabled { opacity: .3; cursor: not-allowed; transform: none; }
+
+  /* ---------- Final result banner ---------- */
+  .finale {
+    max-width: 1100px; margin: 60px auto 0;
+    padding: 0 24px 100px;
+  }
+  .finale-card {
+    background: linear-gradient(135deg, var(--yellow), var(--orange) 50%, var(--pink));
+    border-radius: var(--radius-lg);
+    padding: 50px 40px;
+    color: white;
+    box-shadow: var(--shadow-strong);
+    position: relative; overflow: hidden;
+    text-align: center;
+  }
+  .finale-card::before, .finale-card::after {
+    content: ""; position: absolute; border-radius: 50%;
+    background: rgba(255,255,255,.15);
+  }
+  .finale-card::before { width: 200px; height: 200px; top: -60px; right: -60px; }
+  .finale-card::after  { width: 140px; height: 140px; bottom: -40px; left: -40px; }
+
+  .finale-card h2 {
+    font-size: clamp(1.8rem, 4vw, 2.6rem); margin: 0 0 12px;
+    font-weight: 800; letter-spacing: -.02em;
+  }
+  .finale-card p {
+    max-width: 600px; margin: 0 auto 28px; font-size: 1.05rem;
+    line-height: 1.6; opacity: .95;
+  }
+  .finale-card img {
+    max-width: 100%; height: auto; border-radius: var(--radius-md);
+    border: 4px solid white; box-shadow: var(--shadow-strong);
+    margin-top: 8px;
+  }
+
+  .confetti {
+    position: absolute; font-size: 1.5rem;
+    animation: spin 6s linear infinite;
+  }
+  .confetti:nth-child(1) { top: 12%;  left: 8%;   animation-delay: 0s; }
+  .confetti:nth-child(2) { top: 22%;  right: 6%;  animation-delay: -1s; }
+  .confetti:nth-child(3) { bottom: 14%; left: 12%; animation-delay: -2s; }
+  .confetti:nth-child(4) { bottom: 28%; right: 10%;animation-delay: -3s; }
+  .confetti:nth-child(5) { top: 50%;  left: 4%;   animation-delay: -4s; }
+  @keyframes spin {
+    from { transform: rotate(0deg) translateY(0); }
+    50%  { transform: rotate(180deg) translateY(-20px); }
+    to   { transform: rotate(360deg) translateY(0); }
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    text-align: center; padding: 32px 24px;
+    color: rgba(27,17,69,.5); font-size: .85rem;
+    border-top: 2px dashed rgba(27,17,69,.1);
+  }
+
+  /* ---------- Mobile tweaks ---------- */
+  @media (max-width: 640px) {
+    .step-card { padding: 24px 20px; }
+    .progress-bar { padding: 12px 16px; }
+    .hero { padding: 50px 20px 30px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Floating gradient blobs for the playful backdrop -->
+<div class="bg-blobs" aria-hidden="true">
+  <span></span><span></span><span></span><span></span>
+</div>
+
+<!-- Sticky progress bar with clickable step pills -->
+<nav class="progress-bar" aria-label="Walkthrough progress">
+  <div class="brand">Build Your Own Website <span>3 steps</span></div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-pills" role="tablist">
+    <button class="progress-pill active" data-go="1" aria-label="Step 1">1</button>
+    <button class="progress-pill"        data-go="2" aria-label="Step 2">2</button>
+    <button class="progress-pill"        data-go="3" aria-label="Step 3">3</button>
+  </div>
+</nav>
+
+<!-- Hero -->
+<header class="hero">
+  <div class="badge">🚀 Digital Marketing · Task #1</div>
+  <h1>Build a personal website<br/><span class="grad">from your CV in 3 steps.</span></h1>
+  <p>A bite-sized, clickable walkthrough. Follow along and you'll have your own portfolio live on the internet by the end of this page.</p>
+  <div class="emoji-row" aria-hidden="true">
+    <span>👤</span><span>✨</span><span>🛠️</span><span>🌐</span><span>🎉</span>
+  </div>
+</header>
+
+<!-- Walkthrough -->
+<main class="walkthrough">
+
+  <!-- ============ STEP 1 ============ -->
+  <section class="step-card active" data-step="1" id="step-1">
+    <div class="step-header">
+      <span class="step-num">Step 1</span>
+      <span class="step-tag">Foundation</span>
+      <span class="step-emoji">🔑</span>
+    </div>
+    <h2>Sign up for a free GitHub account</h2>
+    <p class="lede">GitHub gives you a free web address (called <b>GitHub Pages</b>) where your personal site will live. The username you pick becomes part of your URL — so choose wisely!</p>
+
+    <div class="substeps">
+      <div class="substep"><div><b>Go to</b>github.com and click <i>Sign up</i>.</div></div>
+      <div class="substep"><div><b>Enter email, password & pick a username.</b> Only letters, numbers & hyphens allowed.</div></div>
+      <div class="substep"><div><b>Verify</b> your email and you're in.</div></div>
+    </div>
+
+    <div class="showcase">
+      <span class="showcase-label">👀 What it looks like</span>
+      <img src="images/slide3.png" alt="GitHub signup form with username field" />
+      <div class="showcase-caption">Pick a username you'll be proud to share — it becomes your URL.</div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn" disabled aria-label="Previous step">← Previous</button>
+      <button class="btn btn-primary next-btn">Next: Build the site →</button>
+    </div>
+  </section>
+
+  <!-- ============ STEP 2 ============ -->
+  <section class="step-card" data-step="2" id="step-2">
+    <div class="step-header">
+      <span class="step-num">Step 2</span>
+      <span class="step-tag">Build</span>
+      <span class="step-emoji">🤖</span>
+    </div>
+    <h2>Generate your website with AI</h2>
+    <p class="lede">Hand your CV to WorkBuddy (or Codex / Claude Code) and chat until the design feels right. You don't write a single line of code — the AI does it all.</p>
+
+    <div class="substeps">
+      <div class="substep"><div><b>Sign in</b> to WorkBuddy (or Codex / Claude Code with VPN).</div></div>
+      <div class="substep"><div><b>Upload</b> your CV (Word / PDF) and ask for portfolio templates.</div></div>
+      <div class="substep"><div><b>Iterate</b> — change colours, sections, copy — until you love it.</div></div>
+    </div>
+
+    <div class="showcase">
+      <span class="showcase-label">💬 Example chat</span>
+      <img src="images/slide9.png" alt="WorkBuddy chat showing CV upload and template suggestions" />
+      <div class="showcase-caption">"Turn this CV into a personal website" — that one prompt kicks everything off.</div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn prev-btn">← Previous</button>
+      <button class="btn btn-primary next-btn">Next: Deploy →</button>
+    </div>
+  </section>
+
+  <!-- ============ STEP 3 ============ -->
+  <section class="step-card" data-step="3" id="step-3">
+    <div class="step-header">
+      <span class="step-num">Step 3</span>
+      <span class="step-tag">Ship it</span>
+      <span class="step-emoji">🚀</span>
+    </div>
+    <h2>Deploy to GitHub Pages</h2>
+    <p class="lede">Back in GitHub, create a repository named <code>[your-username].github.io</code>, upload the files the AI generated, and within a minute your site is live on the open web.</p>
+
+    <div class="substeps">
+      <div class="substep"><div><b>Create repo</b> with name <code>username.github.io</code>.</div></div>
+      <div class="substep"><div><b>Upload</b> <code>index.html</code> & assets via <i>Add file → Upload files</i>.</div></div>
+      <div class="substep"><div><b>Commit</b> changes and wait ~1 minute. Live at <code>username.github.io</code> ✨</div></div>
+    </div>
+
+    <div class="showcase">
+      <span class="showcase-label">📦 Upload in one click</span>
+      <img src="images/slide12.png" alt="GitHub Add file dropdown showing Upload files option" />
+      <div class="showcase-caption">GitHub's "Add file → Upload files" handles the rest.</div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn prev-btn">← Previous</button>
+      <button class="btn btn-primary" id="finishBtn">🎉 See the result!</button>
+    </div>
+  </section>
+</main>
+
+<!-- ============ FINALE / live preview ============ -->
+<section class="finale" id="finale" hidden>
+  <div class="finale-card">
+    <span class="confetti">🎊</span>
+    <span class="confetti">✨</span>
+    <span class="confetti">🎈</span>
+    <span class="confetti">⭐</span>
+    <span class="confetti">🥳</span>
+    <h2>That's it — your site is live! 🌍</h2>
+    <p>What started as a CV is now a portfolio anyone in the world can visit. Here's Chloe's finished site (the example in your slides):</p>
+    <img src="images/slide15.png" alt="Chloe Chan's finished personal website" />
+  </div>
+</section>
+
+<footer>
+  Built from <i>CVtoWebsite.pptx</i> · Interactive walkthrough
+</footer>
+
+<script>
+(function () {
+  const TOTAL = 3;
+  let current = 1;
+
+  const cards   = document.querySelectorAll('.step-card');
+  const pills   = document.querySelectorAll('.progress-pill');
+  const fill    = document.getElementById('progressFill');
+  const finale  = document.getElementById('finale');
+  const finishBtn = document.getElementById('finishBtn');
+
+  function goTo(step) {
+    step = Math.max(1, Math.min(TOTAL, step));
+    current = step;
+
+    // Update cards
+    cards.forEach(c => {
+      const s = parseInt(c.dataset.step, 10);
+      c.classList.toggle('active', s === step);
+    });
+
+    // Update pills
+    pills.forEach((p, i) => {
+      p.classList.remove('active', 'done');
+      const idx = i + 1;
+      if (idx === step)      p.classList.add('active');
+      else if (idx < step)   p.classList.add('done');
+    });
+
+    // Fill bar
+    fill.style.width = ((step - 1) / (TOTAL - 1) * 100) + '%';
+
+    // Scroll into view smoothly (the progress bar is sticky so it stays on screen)
+    const target = document.getElementById('step-' + step);
+    if (target) {
+      const rect = target.getBoundingClientRect();
+      const offset = window.scrollY + rect.top - 90;
+      window.scrollTo({ top: offset, behavior: 'smooth' });
+    }
+
+    // Hide finale while walking through
+    if (step < TOTAL) finale.hidden = true;
+  }
+
+  // Pills
+  pills.forEach(p => p.addEventListener('click', () => goTo(parseInt(p.dataset.go, 10))));
+
+  // Next / Prev buttons
+  document.querySelectorAll('.next-btn').forEach(b =>
+    b.addEventListener('click', () => goTo(current + 1))
+  );
+  document.querySelectorAll('.prev-btn').forEach(b =>
+    b.addEventListener('click', () => goTo(current - 1))
+  );
+
+  // Finish
+  finishBtn.addEventListener('click', () => {
+    finale.hidden = false;
+    setTimeout(() => {
+      finale.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  });
+
+  // Keyboard: Arrow keys to navigate
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') goTo(current + 1);
+    if (e.key === 'ArrowLeft')  goTo(current - 1);
+  });
+
+  // Initialise
+  goTo(1);
+})();
+</script>
+
+</body>
+</html>
